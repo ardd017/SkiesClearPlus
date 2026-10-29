@@ -13,7 +13,7 @@ import math
 import pathlib
 
 import numpy as np
-from PIL import Image, ImageDraw, ImageFilter
+from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 OUT = pathlib.Path(__file__).resolve().parents[1] / "docs"
 OUT.mkdir(parents=True, exist_ok=True)
@@ -184,13 +184,56 @@ def rounded(img: Image.Image, radius_ratio: float = 0.225) -> Image.Image:
     return out
 
 
-def main() -> None:
-    """Writes the three images the repository actually uses.
+def banner() -> Image.Image:
+    """1280x400 header: icon tile on the left, title and tagline on a matching backdrop."""
+    w, h = 1280, 400
+    grad = np.repeat(vertical_gradient(h, TOP, BOTTOM), w, axis=1)
+    yy, xx = np.mgrid[0:h, 0:w].astype(np.float64)
+    d = np.sqrt((xx - w * 0.80) ** 2 + (yy - h * 0.30) ** 2) / (w * 0.55)
+    glow = np.clip(1.0 - d, 0.0, 1.0) ** 2.6
+    grad = grad + (GLOW[None, None, :] - grad) * (glow[:, :, None] * 0.35)
+    out = Image.fromarray(np.clip(grad, 0, 255).astype(np.uint8), "RGB").convert("RGBA")
 
-    The full resolution ladder (32…1024 px, plus a rounded variant) is written to
-    `docs/` as well; only icon.png / icon-large.png / banner.png are referenced,
-    the rest are there so nobody has to open Pillow to get a 64 px copy.
-    """
+    rng = np.random.default_rng(7)
+    stars = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    sd = ImageDraw.Draw(stars)
+    for _ in range(70):
+        sx, sy = rng.uniform(0, w), rng.uniform(0, h)
+        r = rng.uniform(0.7, 1.9)
+        sd.ellipse([sx - r, sy - r, sx + r, sy + r],
+                   fill=(255, 255, 255, int(rng.uniform(25, 105))))
+    out = Image.alpha_composite(out, stars)
+
+    # icon tile
+    master = build()
+    tile_px = 300
+    tile = rounded(master).resize((tile_px, tile_px), Image.LANCZOS)
+    out.alpha_composite(tile, (56, (h - tile_px) // 2))
+
+    def font(path: str, size: int) -> ImageFont.FreeTypeFont:
+        try:
+            return ImageFont.truetype(path, size)
+        except OSError:
+            return ImageFont.load_default()
+
+    title_font = font("C:/Windows/Fonts/segoeuib.ttf", 92)
+    sub_font = font("C:/Windows/Fonts/msyhbd.ttc", 34)
+    tag_font = font("C:/Windows/Fonts/msyh.ttc", 26)
+
+    tx = 56 + tile_px + 52
+    draw = ImageDraw.Draw(out)
+    draw.text((tx, 108), "SkiesClear Plus", font=title_font, fill=(240, 250, 255, 255))
+    draw.text((tx, 232), "服务端实体清理 · 21 种语言", font=sub_font, fill=CYAN_TOP + (255,))
+    draw.text((tx, 286), "Fabric 1.21.1 · 箱子菜单 · 播报 · 保护期", font=tag_font,
+              fill=(168, 196, 224, 255))
+
+    # gold accent rule, clear of both text lines
+    draw.rounded_rectangle([tx + 2, 350, tx + 98, 354], radius=2, fill=GOLD_TOP + (255,))
+    return out
+
+
+def main() -> None:
+    """Writes the whole image set the repository uses into docs/."""
     master = build()
 
     master.resize((BASE, BASE), Image.LANCZOS).save(OUT / "icon-large.png")
@@ -200,15 +243,7 @@ def main() -> None:
     master.resize((64, 64), Image.LANCZOS).save(OUT / "icon-64.png")
     master.resize((32, 32), Image.LANCZOS).save(OUT / "icon-32.png")
     rounded(master).resize((BASE, BASE), Image.LANCZOS).save(OUT / "icon-rounded.png")
-
-    # README / Modrinth gallery banner
-    banner = Image.new("RGBA", (1280, 400), (0, 0, 0, 0))
-    tile = rounded(master).resize((360, 360), Image.LANCZOS)
-    banner.alpha_composite(tile, (48, 20))
-    strip = np.repeat(vertical_gradient(400, TOP, BOTTOM), 872, axis=1)
-    strip_img = Image.fromarray(np.clip(strip, 0, 255).astype(np.uint8), "RGB").convert("RGBA")
-    banner.alpha_composite(strip_img, (408, 0))
-    banner.save(OUT / "banner.png")
+    banner().save(OUT / "banner.png")
 
     # the copy that ships inside the jar
     mod_icon = OUT.parents[0] / "src" / "main" / "resources" / "assets" / "skiesclear" / "icon.png"
