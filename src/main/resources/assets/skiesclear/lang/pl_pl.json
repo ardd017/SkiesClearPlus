@@ -123,7 +123,7 @@
   "menu.entry.interval.manual": "Dokładne sekundy",
   "menu.entry.interval.manual.tooltip": "<gray>Wpisz dokładną liczbę sekund. Jeśli zmienisz i suwak, i to pole, liczy się to pole.",
   "menu.entry.interval.error": "<red>Musi mieścić się w zakresie od <white>{min}</white> do <white>{max}</white> sekund.",
-  "menu.clearable.rules.hint": "<gray>Jedna reguła na linię: zwykły ID, <white>namespace:*</white> dla całej przestrzeni nazw, <white>#tag=nazwa</white> dla tagu scoreboardu lub <white>#nbt={\"NoAI\":1b}</white> dla danych encji. Cobblemon przyjmuje też <white>#aspect=</white>, <white>#owned</white>, <white>#shiny</white> i inne flagi.",
+  "menu.clearable.rules.hint": "<gray>Jedna reguła na linię: zwykły ID, <white>namespace:*</white> dla całej przestrzeni nazw, <white>#tag=nazwa</white> dla tagu scoreboardu lub <white>#nbt={\"NoAI\":1b}</white> dla danych encji (liczby wymagają sufiksu <white>b</white>/<white>s</white>/<white>l</white>/<white>f</white>/<white>d</white>). Cobblemon przyjmuje też <white>#aspect=</white>, <white>#owned</white>, <white>#shiny</white> i inne flagi.",
   "menu.entry.grace": "Okres ochronny (sekundy)",
   "menu.entry.grace.tooltip": "<gray>Encje młodsze niż ten czas nie są usuwane. <white>0</white> wyłącza ochronę.",
   "menu.entry.grace.error": "<red>Musi być między <white>{min}</white> a <white>{max}</white> sekund.",

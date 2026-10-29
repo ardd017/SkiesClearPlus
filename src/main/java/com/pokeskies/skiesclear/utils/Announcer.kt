@@ -11,6 +11,7 @@ import com.pokeskies.skiesclear.ClearTask
 import com.pokeskies.skiesclear.SkiesClear
 import com.pokeskies.skiesclear.config.ConfigManager
 import net.fabricmc.loader.api.FabricLoader
+import net.minecraft.network.chat.Component
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerPlayer
 
@@ -81,15 +82,31 @@ object Announcer {
      *
      * The per-entry lines use `message.broadcast.entry` and are only appended when at least one task
      * is running; with everything disabled the header alone still carries the count of `0`.
+     *
+     * Players are grouped by language first, so the whole block is rendered once per *language*
+     * instead of once per player per entry. On a 100-player server with three entries the old shape
+     * was 400 component builds on join; this is at most a handful.
      */
     private fun send(recipients: Collection<ServerPlayer>, lines: List<String>, tasks: List<ClearTask>) {
         if (lines.isEmpty() || recipients.isEmpty()) return
 
-        Utils.broadcast(recipients, lines) { basePlaceholders(tasks.size) }
+        val perLocale = LinkedHashMap<String, MutableList<ServerPlayer>>()
+        for (player in recipients) {
+            perLocale.getOrPut(I18n.localeFor(player)) { ArrayList() }.add(player)
+        }
 
-        for (task in tasks) {
-            Utils.broadcast(recipients, listOf(ENTRY_KEY)) { locale ->
-                basePlaceholders(tasks.size) + taskPlaceholders(task, locale)
+        for ((locale, players) in perLocale) {
+            val base = basePlaceholders(tasks.size)
+            val components = ArrayList<Component>(lines.size + tasks.size)
+            for (line in lines) {
+                components.add(Utils.deserializeText(line, locale, base))
+            }
+            for (task in tasks) {
+                val placeholders = base + taskPlaceholders(task, locale)
+                components.add(Utils.deserializeText(ENTRY_KEY, locale, placeholders))
+            }
+            for (player in players) {
+                for (component in components) player.sendSystemMessage(component)
             }
         }
     }

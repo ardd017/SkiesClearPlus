@@ -123,7 +123,7 @@
   "menu.entry.interval.manual": "Точные секунды",
   "menu.entry.interval.manual.tooltip": "<gray>Введите точное число секунд. Если изменить и ползунок, и это поле, приоритет у поля.",
   "menu.entry.interval.error": "<red>Должно быть от <white>{min}</white> до <white>{max}</white> секунд.",
-  "menu.clearable.rules.hint": "<gray>Одно правило на строку: обычный ID, <white>namespace:*</white> для всего пространства имён, <white>#tag=имя</white> для тега счёта или <white>#nbt={\"NoAI\":1b}</white> для данных сущности. Cobblemon также принимает <white>#aspect=</white>, <white>#owned</white>, <white>#shiny</white> и другие флаги.",
+  "menu.clearable.rules.hint": "<gray>Одно правило на строку: обычный ID, <white>namespace:*</white> для всего пространства имён, <white>#tag=имя</white> для тега счёта или <white>#nbt={\"NoAI\":1b}</white> для данных сущности (числам нужен суффикс <white>b</white>/<white>s</white>/<white>l</white>/<white>f</white>/<white>d</white>). Cobblemon также принимает <white>#aspect=</white>, <white>#owned</white>, <white>#shiny</white> и другие флаги.",
   "menu.entry.grace": "Защитный интервал (секунды)",
   "menu.entry.grace.tooltip": "<gray>Сущности моложе этого возраста не удаляются. <white>0</white> отключает защиту.",
   "menu.entry.grace.error": "<red>Должно быть от <white>{min}</white> до <white>{max}</white> секунд.",

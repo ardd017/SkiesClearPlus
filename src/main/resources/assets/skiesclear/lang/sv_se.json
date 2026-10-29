@@ -123,7 +123,7 @@
   "menu.entry.interval.manual": "Exakta sekunder",
   "menu.entry.interval.manual.tooltip": "<gray>Ange ett exakt antal sekunder. Om du ändrar både reglaget och det här fältet gäller det här fältet.",
   "menu.entry.interval.error": "<red>Måste vara mellan <white>{min}</white> och <white>{max}</white> sekunder.",
-  "menu.clearable.rules.hint": "<gray>En regel per rad: ett vanligt ID, <white>namespace:*</white> för en hel namespace, <white>#tag=namn</white> för en scoreboard-tagg eller <white>#nbt={\"NoAI\":1b}</white> för entitetsdata. Cobblemon accepterar även <white>#aspect=</white>, <white>#owned</white>, <white>#shiny</white> och andra flaggor.",
+  "menu.clearable.rules.hint": "<gray>En regel per rad: ett vanligt ID, <white>namespace:*</white> för en hel namespace, <white>#tag=namn</white> för en scoreboard-tagg eller <white>#nbt={\"NoAI\":1b}</white> för entitetsdata (tal behöver suffixet <white>b</white>/<white>s</white>/<white>l</white>/<white>f</white>/<white>d</white>). Cobblemon accepterar även <white>#aspect=</white>, <white>#owned</white>, <white>#shiny</white> och andra flaggor.",
   "menu.entry.grace": "Frist (sekunder)",
   "menu.entry.grace.tooltip": "<gray>Entiteter som är nyare än så här rensas aldrig. <white>0</white> stänger av skyddet.",
   "menu.entry.grace.error": "<red>Måste vara mellan <white>{min}</white> och <white>{max}</white> sekunder.",

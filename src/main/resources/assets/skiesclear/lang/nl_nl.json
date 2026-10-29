@@ -123,7 +123,7 @@
   "menu.entry.interval.manual": "Exacte seconden",
   "menu.entry.interval.manual.tooltip": "<gray>Typ een exact aantal seconden. Als je zowel de schuifregelaar als dit veld wijzigt, wint dit veld.",
   "menu.entry.interval.error": "<red>Moet tussen <white>{min}</white> en <white>{max}</white> seconden liggen.",
-  "menu.clearable.rules.hint": "<gray>Eén regel per regel: een gewone ID, <white>namespace:*</white> voor een hele namespace, <white>#tag=naam</white> voor een scoreboard-tag of <white>#nbt={\"NoAI\":1b}</white> voor entiteitsgegevens. Cobblemon accepteert ook <white>#aspect=</white>, <white>#owned</white>, <white>#shiny</white> en andere vlaggen.",
+  "menu.clearable.rules.hint": "<gray>Eén regel per regel: een gewone ID, <white>namespace:*</white> voor een hele namespace, <white>#tag=naam</white> voor een scoreboard-tag of <white>#nbt={\"NoAI\":1b}</white> voor entiteitsgegevens (getallen hebben een suffix <white>b</white>/<white>s</white>/<white>l</white>/<white>f</white>/<white>d</white> nodig). Cobblemon accepteert ook <white>#aspect=</white>, <white>#owned</white>, <white>#shiny</white> en andere vlaggen.",
   "menu.entry.grace": "Genadeperiode (seconden)",
   "menu.entry.grace.tooltip": "<gray>Nieuwere entities worden nooit verwijderd. <white>0</white> schakelt de bescherming uit.",
   "menu.entry.grace.error": "<red>Moet tussen <white>{min}</white> en <white>{max}</white> seconden liggen.",

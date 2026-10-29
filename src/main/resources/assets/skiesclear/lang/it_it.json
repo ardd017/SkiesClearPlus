@@ -123,7 +123,7 @@
   "menu.entry.interval.manual": "Secondi esatti",
   "menu.entry.interval.manual.tooltip": "<gray>Inserisci un numero esatto di secondi. Se modifichi sia il cursore sia questo campo, vince questo campo.",
   "menu.entry.interval.error": "<red>Deve essere compreso tra <white>{min}</white> e <white>{max}</white> secondi.",
-  "menu.clearable.rules.hint": "<gray>Una regola per riga: un ID semplice, <white>namespace:*</white> per un intero namespace, <white>#tag=nome</white> per un tag della scoreboard o <white>#nbt={\"NoAI\":1b}</white> per i dati dell'entità. Cobblemon accetta anche <white>#aspect=</white>, <white>#owned</white>, <white>#shiny</white> e altri flag.",
+  "menu.clearable.rules.hint": "<gray>Una regola per riga: un ID semplice, <white>namespace:*</white> per un intero namespace, <white>#tag=nome</white> per un tag della scoreboard o <white>#nbt={\"NoAI\":1b}</white> per i dati dell'entità (i numeri richiedono un suffisso <white>b</white>/<white>s</white>/<white>l</white>/<white>f</white>/<white>d</white>). Cobblemon accetta anche <white>#aspect=</white>, <white>#owned</white>, <white>#shiny</white> e altri flag.",
   "menu.entry.grace": "Periodo di tolleranza (secondi)",
   "menu.entry.grace.tooltip": "<gray>Le entità più recenti non vengono mai rimosse. <white>0</white> disattiva la protezione.",
   "menu.entry.grace.error": "<red>Deve essere tra <white>{min}</white> e <white>{max}</white> secondi.",

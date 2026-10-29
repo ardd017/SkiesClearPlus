@@ -123,7 +123,7 @@
   "menu.entry.interval.manual": "Segundos exactos",
   "menu.entry.interval.manual.tooltip": "<gray>Escribe un número exacto de segundos. Si cambias el deslizador y este campo, prevalece este campo.",
   "menu.entry.interval.error": "<red>Debe estar entre <white>{min}</white> y <white>{max}</white> segundos.",
-  "menu.clearable.rules.hint": "<gray>Una regla por línea: un ID simple, <white>namespace:*</white> para todo un namespace, <white>#tag=nombre</white> para una etiqueta de scoreboard o <white>#nbt={\"NoAI\":1b}</white> para datos de entidad. Cobblemon también acepta <white>#aspect=</white>, <white>#owned</white>, <white>#shiny</white> y otros indicadores.",
+  "menu.clearable.rules.hint": "<gray>Una regla por línea: un ID simple, <white>namespace:*</white> para todo un namespace, <white>#tag=nombre</white> para una etiqueta de scoreboard o <white>#nbt={\"NoAI\":1b}</white> para datos de entidad (los números necesitan sufijo <white>b</white>/<white>s</white>/<white>l</white>/<white>f</white>/<white>d</white>). Cobblemon también acepta <white>#aspect=</white>, <white>#owned</white>, <white>#shiny</white> y otros indicadores.",
   "menu.entry.grace": "Periodo de gracia (segundos)",
   "menu.entry.grace.tooltip": "<gray>Las entidades más recientes nunca se eliminan. <white>0</white> desactiva la protección.",
   "menu.entry.grace.error": "<red>Debe estar entre <white>{min}</white> y <white>{max}</white> segundos.",

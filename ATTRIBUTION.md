@@ -48,6 +48,13 @@ but most of it was rewritten rather than patched.
 | `SkiesClearClient` was a Kotlin `object` | private constructor → `IllegalAccessException` from Fabric's entrypoint adapter, crash on startup |
 | `!flag.also { target = it }` | `also` bound to the negated value, so toggles always wrote `false` |
 | `ClearManager.reload()` rebuilt every task | Changing the language or saving either menu reset every countdown back to a full interval |
+| `CompoundTagAdaptor` only produced int/double/string tags | `#nbt={"NoAI":1b}` and every other byte/short rule silently matched nothing; entities were cleared despite being listed |
+| `ConfigManager.loadFile` only caught `IOException` | A malformed `config.json` fell through to the built-in defaults: every clear entry vanished, no backup, no message |
+| `ClearTask.tick` cleared one tick late | A 5 s interval fired every 119 ticks; every interval was longer than configured |
+| `ClearTask.getLevels` treated "no dimensions" and "no match" as the same case | A typo in `dimensions` silently degraded to clearing every dimension |
+| `ClearTask.dispatchWarning` fallback tested `warningMessageKeys` | With the stock `warning_seconds` only 10 s and 5 s announced; 60/30/3/1 were mute |
+| `ClearTask.placeholders` filled `{id}` with the display name | `{id}` printed `<display_name>` instead of the entry key |
+| `ConfigManager` used `FileWriter` | Writes followed the platform charset; on a Chinese Windows install that is GBK, so hand-edited UTF-8 files broke |
 
 ### Known upstream issue left unfixed
 

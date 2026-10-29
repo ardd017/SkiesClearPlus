@@ -123,7 +123,7 @@
   "menu.entry.interval.manual": "精確秒數",
   "menu.entry.interval.manual.tooltip": "<gray>直接輸入確切的秒數。滑桿和這裡都改過時，以這裡為準。",
   "menu.entry.interval.error": "<red>必須在 <white>{min}</white> 到 <white>{max}</white> 秒之間。",
-  "menu.clearable.rules.hint": "<gray>每行一條規則：直接寫 ID 精確比對，<white>命名空間:*</white> 比對整個命名空間，<white>#tag=名稱</white> 比對計分板標籤，<white>#nbt={\"NoAI\":1b}</white> 比對實體資料。Cobblemon 還支援 <white>#aspect=</white>、<white>#owned</white>、<white>#shiny</white> 等旗標。",
+  "menu.clearable.rules.hint": "<gray>每行一條規則：直接寫 ID 精確比對，<white>命名空間:*</white> 比對整個命名空間，<white>#tag=名稱</white> 比對計分板標籤，<white>#nbt={\"NoAI\":1b}</white> 比對實體資料（數字要帶 <white>b</white>/<white>s</white>/<white>l</white>/<white>f</white>/<white>d</white> 後綴）。Cobblemon 還支援 <white>#aspect=</white>、<white>#owned</white>、<white>#shiny</white> 等旗標。",
   "menu.entry.grace": "保護期（秒）",
   "menu.entry.grace.tooltip": "<gray>比這個時間更年輕的實體不會被清理。<white>0</white> 表示關閉保護。",
   "menu.entry.grace.error": "<red>必須在 <white>{min}</white> 到 <white>{max}</white> 秒之間。",

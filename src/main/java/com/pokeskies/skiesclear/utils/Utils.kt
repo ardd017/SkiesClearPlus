@@ -10,9 +10,6 @@
 package com.pokeskies.skiesclear.utils
 
 import com.google.gson.*
-import com.mojang.serialization.Codec
-import com.mojang.serialization.JsonOps
-import com.mojang.serialization.codecs.RecordCodecBuilder
 import com.pokeskies.skiesclear.SkiesClear
 import com.pokeskies.skiesclear.config.ConfigManager
 import net.kyori.adventure.text.minimessage.MiniMessage
@@ -22,8 +19,6 @@ import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ServerPlayer
 import java.lang.reflect.Type
-import java.util.*
-import java.util.function.Function
 
 object Utils {
     val miniMessage: MiniMessage = MiniMessage.miniMessage()
@@ -181,27 +176,6 @@ object Utils {
         }
     }
 
-    data class CodecSerializer<T>(val codec: Codec<T>) : JsonSerializer<T>, JsonDeserializer<T> {
-        @Throws(JsonParseException::class)
-        override fun deserialize(json: JsonElement?, typeOfT: Type?, context: JsonDeserializationContext?): T? {
-            return try {
-                codec.decode(JsonOps.INSTANCE, json).orThrow.first
-            } catch (e: Throwable) {
-                printError("There was an error while deserializing a Codec: $codec")
-                null
-            }
-        }
-
-        override fun serialize(src: T?, typeOfSrc: Type?, context: JsonSerializationContext?): JsonElement {
-            return try {
-                if (src != null) codec.encodeStart(JsonOps.INSTANCE, src).orThrow else JsonNull.INSTANCE
-            } catch (e: Throwable) {
-                printError("There was an error while serializing a Codec: $codec")
-                JsonNull.INSTANCE
-            }
-        }
-    }
-
     class ResourceLocationSerializer : JsonSerializer<ResourceLocation>, JsonDeserializer<ResourceLocation> {
         @Throws(JsonParseException::class)
         override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): ResourceLocation? {
@@ -212,12 +186,4 @@ object Utils {
             return JsonPrimitive(src.toString())
         }
     }
-}
-
-fun <A, B> Codec<A>.recordCodec(id: String, getter: Function<B, A>): RecordCodecBuilder<B, A> {
-    return this.fieldOf(id).forGetter(getter)
-}
-
-fun <A, B> Codec<A>.optionalRecordCodec(id: String, getter: Function<B, A>, default: A): RecordCodecBuilder<B, A> {
-    return this.fieldOf(id).orElse(default).forGetter(getter)
 }

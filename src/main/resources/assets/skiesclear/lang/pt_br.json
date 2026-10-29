@@ -123,7 +123,7 @@
   "menu.entry.interval.manual": "Segundos exatos",
   "menu.entry.interval.manual.tooltip": "<gray>Digite um número exato de segundos. Se alterar o controle e este campo, este campo prevalece.",
   "menu.entry.interval.error": "<red>Deve estar entre <white>{min}</white> e <white>{max}</white> segundos.",
-  "menu.clearable.rules.hint": "<gray>Uma regra por linha: um ID simples, <white>namespace:*</white> para um namespace inteiro, <white>#tag=nome</white> para uma tag de placar ou <white>#nbt={\"NoAI\":1b}</white> para dados de entidade. Cobblemon também aceita <white>#aspect=</white>, <white>#owned</white>, <white>#shiny</white> e outras flags.",
+  "menu.clearable.rules.hint": "<gray>Uma regra por linha: um ID simples, <white>namespace:*</white> para um namespace inteiro, <white>#tag=nome</white> para uma tag de placar ou <white>#nbt={\"NoAI\":1b}</white> para dados de entidade (números precisam de sufixo <white>b</white>/<white>s</white>/<white>l</white>/<white>f</white>/<white>d</white>). Cobblemon também aceita <white>#aspect=</white>, <white>#owned</white>, <white>#shiny</white> e outras flags.",
   "menu.entry.grace": "Período de carência (segundos)",
   "menu.entry.grace.tooltip": "<gray>Entidades mais recentes nunca são limpas. <white>0</white> desativa a proteção.",
   "menu.entry.grace.error": "<red>Deve estar entre <white>{min}</white> e <white>{max}</white> segundos.",

@@ -123,7 +123,7 @@
   "menu.entry.interval.manual": "ระบุจำนวนวินาที",
   "menu.entry.interval.manual.tooltip": "<gray>พิมพ์จำนวนวินาทีที่ต้องการ หากแก้ทั้งแถบเลื่อนและช่องนี้ ช่องนี้จะถูกใช้",
   "menu.entry.interval.error": "<red>ต้องอยู่ระหว่าง <white>{min}</white> ถึง <white>{max}</white> วินาที",
-  "menu.clearable.rules.hint": "<gray>หนึ่งบรรทัดต่อหนึ่งกฎ: ใส่ ID ตรง ๆ, <white>namespace:*</white> สำหรับทั้งเนมสเปซ, <white>#tag=ชื่อ</white> สำหรับแท็ก scoreboard หรือ <white>#nbt={\"NoAI\":1b}</white> สำหรับข้อมูลเอนทิตี รองรับ <white>#aspect=</white>, <white>#owned</white>, <white>#shiny</white> และแฟล็กอื่น ๆ สำหรับ Cobblemon",
+  "menu.clearable.rules.hint": "<gray>หนึ่งบรรทัดต่อหนึ่งกฎ: ใส่ ID ตรง ๆ, <white>namespace:*</white> สำหรับทั้งเนมสเปซ, <white>#tag=ชื่อ</white> สำหรับแท็ก scoreboard หรือ <white>#nbt={\"NoAI\":1b}</white> สำหรับข้อมูลเอนทิตี (ตัวเลขต้องมีคำต่อท้าย <white>b</white>/<white>s</white>/<white>l</white>/<white>f</white>/<white>d</white>) รองรับ <white>#aspect=</white>, <white>#owned</white>, <white>#shiny</white> และแฟล็กอื่น ๆ สำหรับ Cobblemon",
   "menu.entry.grace": "ระยะปกป้อง (วินาที)",
   "menu.entry.grace.tooltip": "<gray>เอนทิตีที่ใหม่กว่านี้จะไม่ถูกลบ <white>0</white> คือปิดการปกป้อง",
   "menu.entry.grace.error": "<red>ต้องอยู่ระหว่าง <white>{min}</white> ถึง <white>{max}</white> วินาที",

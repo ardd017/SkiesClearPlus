@@ -24,6 +24,9 @@ class CompoundTagAdaptor : JsonSerializer<CompoundTag>, JsonDeserializer<Compoun
                             "short" -> tag.putShort(key, valueField.asShort)
                             "int" -> tag.putInt(key, valueField.asInt)
                             "long" -> tag.putLong(key, valueField.asLong)
+                            "float" -> tag.putFloat(key, valueField.asFloat)
+                            "double" -> tag.putDouble(key, valueField.asDouble)
+                            "boolean" -> tag.putBoolean(key, valueField.asBoolean)
                             "string" -> tag.putString(key, valueField.asString)
                             else -> tag.putString(key, valueField.toString())
                         }
@@ -33,16 +36,14 @@ class CompoundTagAdaptor : JsonSerializer<CompoundTag>, JsonDeserializer<Compoun
                 }
             } else if (value.isJsonPrimitive) { // Handle primitive values like normal JSON does
                 val primitive = value.asJsonPrimitive
-                when { // Valid default types are either Double, Int, Boolean, or String
-                    primitive.isNumber -> {
-                        if (primitive.asString.contains('.')) {
-                            tag.putDouble(key, primitive.asDouble)
-                        } else {
-                            tag.putInt(key, primitive.asInt)
+                when {
+                    primitive.isBoolean -> tag.putBoolean(key, primitive.asBoolean)
+                    primitive.isNumber -> putNumber(key, primitive.asString, tag)
+                    primitive.isString -> {
+                        if (!putTypedString(key, primitive.asString, tag)) {
+                            tag.putString(key, primitive.asString)
                         }
                     }
-                    primitive.isBoolean -> tag.putBoolean(key, primitive.asBoolean)
-                    primitive.isString -> tag.putString(key, primitive.asString)
                     else -> tag.putString(key, primitive.toString())
                 }
             } else if (value.isJsonArray) { // If its an array, we need to determine the type of the list
@@ -108,6 +109,17 @@ class CompoundTagAdaptor : JsonSerializer<CompoundTag>, JsonDeserializer<Compoun
                     addProperty("type", "long")
                     addProperty("value", src.getLong(key))
                 })
+                // Float and double were missing from this list, so a rule or a saved tag holding one
+                // silently lost the key. Neither has an SNBT suffix in the deserializer, hence the
+                // explicit `type` form rather than a bare number.
+                is FloatTag -> obj.add(key, JsonObject().apply {
+                    addProperty("type", "float")
+                    addProperty("value", src.getFloat(key))
+                })
+                is DoubleTag -> obj.add(key, JsonObject().apply {
+                    addProperty("type", "double")
+                    addProperty("value", src.getDouble(key))
+                })
                 is StringTag -> {
                     obj.addProperty(key, src.getString(key))
                 }
@@ -141,6 +153,50 @@ class CompoundTagAdaptor : JsonSerializer<CompoundTag>, JsonDeserializer<Compoun
         return obj
     }
 
+    /**
+     * Stores a JSON number, honouring the SNBT type suffix players copy out of `/data get`.
+     *
+     * Without the suffix a whole number becomes an [IntTag] and a fractional one a [DoubleTag]. That
+     * default is why `{"OnGround":0b}` never matched: vanilla stores `OnGround` as a byte, and
+     * `IntTag(0) != ByteTag(0)`. Reading the suffix lets `0b` / `32767s` / `1L` / `1.5f` keep the
+     * exact width the game uses, which is what a `#nbt=` rule compares against.
+     */
+    private fun putNumber(key: String, raw: String, tag: CompoundTag) {
+        val body = raw.dropLast(1)
+        when (raw.lastOrNull()?.lowercaseChar()) {
+            'b' -> tag.putByte(key, (body.toDoubleOrNull() ?: raw.toDoubleOrNull())?.toInt()?.toByte() ?: 0)
+            's' -> tag.putShort(key, (body.toDoubleOrNull() ?: raw.toDoubleOrNull())?.toInt()?.toShort() ?: 0)
+            'l' -> tag.putLong(key, (body.toDoubleOrNull() ?: raw.toDoubleOrNull())?.toLong() ?: 0L)
+            'f' -> tag.putFloat(key, (body.toDoubleOrNull() ?: raw.toDoubleOrNull())?.toFloat() ?: 0f)
+            'd' -> tag.putDouble(key, body.toDoubleOrNull() ?: raw.toDoubleOrNull() ?: 0.0)
+            else -> {
+                val value = raw.toDoubleOrNull() ?: 0.0
+                if (raw.contains('.')) tag.putDouble(key, value) else tag.putInt(key, value.toInt())
+            }
+        }
+    }
+
+    /**
+     * Interprets a bare JSON string that actually carries an SNBT suffix.
+     *
+     * `{"NoAI":1b}` reaches this adaptor as the *string* `"1b"`, because `1b` is not valid JSON
+     * syntax: Gson reads it leniently. Treating such a value as a string used to produce
+     * `StringTag("1b")`, which matches nothing on a real entity. A suffix only counts when the
+     * remainder parses as a number, so a genuine string like `"Steve"` or `"1b"` used as text is
+     * unaffected unless it consists of digits plus one suffix letter.
+     *
+     * @return true when the value was stored as a numeric tag and the caller should not also store
+     *         it as a string.
+     */
+    private fun putTypedString(key: String, raw: String, tag: CompoundTag): Boolean {
+        if (raw.length < 2) return false
+        val suffix = raw.last().lowercaseChar()
+        if (suffix !in NUMERIC_SUFFIXES) return false
+        if (raw.dropLast(1).toDoubleOrNull() == null) return false
+        putNumber(key, raw, tag)
+        return true
+    }
+
     // Attempts to determine the type of a list based on its contents. If all elements are of the same type, it returns that type.
     // If any element is of a different type, it defaults to all being treated as a list of strings.
     private fun determineListType(arr: JsonArray): InternalListType {
@@ -155,5 +211,10 @@ class CompoundTagAdaptor : JsonSerializer<CompoundTag>, JsonDeserializer<Compoun
             }
         }.toSet()
         return if (types.size == 1) types.first() else InternalListType.STRING
+    }
+
+    private companion object {
+        /** SNBT numeric suffixes players copy out of `/data get entity`. */
+        val NUMERIC_SUFFIXES: Set<Char> = setOf('b', 's', 'l', 'f', 'd')
     }
 }

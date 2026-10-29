@@ -32,6 +32,8 @@ import net.minecraft.sounds.SoundSource
  * rendering loop because "5 minutes" differs per language.
  */
 class ClearTask(
+    /** The key this entry has in `clears`, exposed as the `{id}` placeholder. */
+    val clearId: String,
     val clearConfig: ClearConfig
 ) {
     private var dimensions: List<ServerLevel>? = null
@@ -99,27 +101,50 @@ class ClearTask(
         return total
     }
 
+    /**
+     * One second of the countdown.
+     *
+     * Warnings fire on the second they are configured for, *before* the tick that consumes it, so
+     * `warning_seconds: [3]` announces "3 seconds left" with exactly three seconds to go.
+     *
+     * The clear fires on the tick that takes the counter from `0` to `-1`, not the one that brings
+     * it to `0`. Previously the two were separate ticks, which made every interval one second
+     * longer than configured (a 5 s entry cleared every 119 ticks instead of 100).
+     */
     fun tick(server: MinecraftServer) {
         if (timer in warningTicks) dispatchWarning(server)
 
         if (timer <= 0) {
             resetTimer()
             runClear(server, true)
-        } else {
-            timer--
+            return
+        }
+
+        timer--
+        if (timer <= 0) {
+            resetTimer()
+            runClear(server, true)
         }
     }
 
     private fun dispatchWarning(server: MinecraftServer) {
-        // An explicit override wins; otherwise the shared `default` template is used when the second
-        // came from `warning_seconds` rather than from an explicit entry in `messages.warnings`.
+        // An explicit override wins; otherwise the shared `default` template is used for every
+        // second this task is configured to warn on.
+        //
+        // The old condition was `timer in warningMessageKeys`, i.e. only seconds that already had a
+        // `messages.warnings` entry got the fallback — which is circular. A stock config with
+        // `warning_seconds: [60, 30, 10, 5, 3, 1]` therefore stayed completely mute at 60, 30, 3
+        // and 1 second and only spoke at 10 and 5. Any second in `warningTicks` now warns.
         val lines = clearConfig.messages.warnings[timer.toString()]
             ?: clearConfig.messages.warnings[DEFAULT_WARNING_KEY]
-            ?: if (timer in warningMessageKeys) ClearConfig.DEFAULT_WARNING else null
+            ?: if (timer in warningTicks) ClearConfig.DEFAULT_WARNING else null
         val sound = warningSounds[timer]
         if (lines == null && sound == null) return
 
         val recipients = server.playerList.players.filter { shouldInform(it) }
+        // Debug-only breadcrumb: without it a working warning with nobody online is
+        // indistinguishable from a warning that never fired.
+        Utils.printDebug("Warning at ${timer}s for '$clearId' to ${recipients.size} player(s)")
         if (recipients.isEmpty()) return
 
         if (lines != null) {
@@ -157,7 +182,9 @@ class ClearTask(
         val map = LinkedHashMap<String, String>(cleared.size + 8)
         val name = displayName(resolved)
         map["clear"] = name
-        map["id"] = name
+        // `id` is the config key, not the display name: `command.info.summary` renders
+        // "id {id}", and before this fix that line showed the display name twice.
+        map["id"] = clearId
         map["clear_amount"] = total.toString()
         map["clear_time"] = Utils.getFormattedTime(clearConfig.interval.toLong(), resolved)
         map["interval_seconds"] = clearConfig.interval.toString()
@@ -188,14 +215,41 @@ class ClearTask(
 
     // ------------------------------------------------------------------ state
 
+    /**
+     * Levels this entry may clear in.
+     *
+     * An empty `dimensions` list means "every dimension" and is resolved once. A non-empty list
+     * that matches nothing is a configuration error, not a synonym for "all": a single typo used to
+     * silently widen a Nether-only entry to the whole server, which is the most destructive failure
+     * mode this class has. That case keeps clearing *nothing* and says so loudly, so the operator
+     * notices instead of finding their overworld emptied.
+     */
     fun getLevels(server: MinecraftServer): List<ServerLevel> {
         dimensions?.let { return it }
-        var resolved = server.allLevels.filter {
-            clearConfig.dimensions.contains(it.dimension().location().toString())
+
+        val configured = clearConfig.dimensions
+        val resolved = if (configured.isEmpty()) {
+            server.allLevels.toList()
+        } else {
+            server.allLevels.filter { configured.contains(it.dimension().location().toString()) }
         }
-        if (resolved.isEmpty()) resolved = server.allLevels.toList()
+
+        if (resolved.isEmpty() && configured.isNotEmpty()) {
+            // Not cached: a datapack or another mod may register the dimension later.
+            warnUnresolvedDimensions(server, configured)
+            return emptyList()
+        }
+
         dimensions = resolved
         return resolved
+    }
+
+    private fun warnUnresolvedDimensions(server: MinecraftServer, configured: List<String>) {
+        val known = server.allLevels.joinToString(", ") { it.dimension().location().toString() }
+        Utils.printWarn(
+            "Clear entry '$clearId' lists dimensions that do not exist: ${configured.joinToString(", ")}. " +
+                "Nothing will be cleared for this entry. Known dimensions: $known"
+        )
     }
 
     fun shouldInform(player: ServerPlayer): Boolean {
@@ -225,11 +279,6 @@ class ClearTask(
         if (previous === this) return
         if (previous.baseInterval != baseInterval) return
         timer = previous.timer.coerceIn(0, baseInterval)
-    }
-
-    /** Invalidates the cached level list, e.g. when `/reload` recreates the task. */
-    fun invalidateLevels() {
-        dimensions = null
     }
 
     // ------------------------------------------------------------------ helpers

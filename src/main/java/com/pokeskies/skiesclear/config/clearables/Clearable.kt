@@ -83,16 +83,12 @@ abstract class Clearable<T : Entity>(
     }
 
     /**
-     * Suffix that identifies this clearable's count. Rendered as `%clear_amount_<key>%` in messages,
-     * so `items` produces `%clear_amount_items%`.
+     * Suffix that identifies this clearable's count, used as the placeholder name.
+     *
+     * [com.pokeskies.skiesclear.ClearTask.placeholders] puts the number under `key` verbatim, so
+     * `items` is readable in a message as `{items}`.
      */
     abstract fun getPlaceholderKey(): String
-
-    /** The `%...%` token for this clearable's count, used when building placeholder maps. */
-    fun getPlaceholder(): String = "%clear_amount_${getPlaceholderKey()}%"
-
-    /** Legacy helper kept for config compatibility; prefers the placeholder map path. */
-    fun parse(string: String, total: Int): String = string.replace(getPlaceholder(), total.toString())
 
     /**
      * Reads and writes the `clearables` block.

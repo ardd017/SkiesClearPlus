@@ -123,7 +123,7 @@
   "menu.entry.interval.manual": "Sekunden genau eingeben",
   "menu.entry.interval.manual.tooltip": "<gray>Gib eine exakte Sekundenzahl ein. Wenn du sowohl den Regler als auch dieses Feld änderst, gilt dieses Feld.",
   "menu.entry.interval.error": "<red>Muss zwischen <white>{min}</white> und <white>{max}</white> Sekunden liegen.",
-  "menu.clearable.rules.hint": "<gray>Eine Regel pro Zeile: eine reine ID, <white>namespace:*</white> für einen ganzen Namespace, <white>#tag=name</white> für einen Scoreboard-Tag oder <white>#nbt={\"NoAI\":1b}</white> für Entity-Daten. Cobblemon akzeptiert zusätzlich <white>#aspect=</white>, <white>#owned</white>, <white>#shiny</white> und weitere Flags.",
+  "menu.clearable.rules.hint": "<gray>Eine Regel pro Zeile: eine reine ID, <white>namespace:*</white> für einen ganzen Namespace, <white>#tag=name</white> für einen Scoreboard-Tag oder <white>#nbt={\"NoAI\":1b}</white> für Entity-Daten (Zahlen brauchen ein Suffix <white>b</white>/<white>s</white>/<white>l</white>/<white>f</white>/<white>d</white>). Cobblemon akzeptiert zusätzlich <white>#aspect=</white>, <white>#owned</white>, <white>#shiny</white> und weitere Flags.",
   "menu.entry.grace": "Schonfrist (Sekunden)",
   "menu.entry.grace.tooltip": "<gray>Jüngere Entities werden nie gelöscht. <white>0</white> schaltet den Schutz ab.",
   "menu.entry.grace.error": "<red>Muss zwischen <white>{min}</white> und <white>{max}</white> Sekunden liegen.",

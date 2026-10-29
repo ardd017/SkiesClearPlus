@@ -123,7 +123,7 @@
   "menu.entry.interval.manual": "Số giây chính xác",
   "menu.entry.interval.manual.tooltip": "<gray>Nhập số giây chính xác. Nếu sửa cả thanh trượt và ô này, ô này sẽ được ưu tiên.",
   "menu.entry.interval.error": "<red>Phải nằm trong khoảng <white>{min}</white> đến <white>{max}</white> giây.",
-  "menu.clearable.rules.hint": "<gray>Mỗi dòng một quy tắc: ID thường, <white>namespace:*</white> cho cả namespace, <white>#tag=tên</white> cho thẻ scoreboard hoặc <white>#nbt={\"NoAI\":1b}</white> cho dữ liệu thực thể. Cobblemon còn nhận <white>#aspect=</white>, <white>#owned</white>, <white>#shiny</white> và các cờ khác.",
+  "menu.clearable.rules.hint": "<gray>Mỗi dòng một quy tắc: ID thường, <white>namespace:*</white> cho cả namespace, <white>#tag=tên</white> cho thẻ scoreboard hoặc <white>#nbt={\"NoAI\":1b}</white> cho dữ liệu thực thể (số cần hậu tố <white>b</white>/<white>s</white>/<white>l</white>/<white>f</white>/<white>d</white>). Cobblemon còn nhận <white>#aspect=</white>, <white>#owned</white>, <white>#shiny</white> và các cờ khác.",
   "menu.entry.grace": "Thời gian bảo vệ (giây)",
   "menu.entry.grace.tooltip": "<gray>Thực thể mới hơn mốc này sẽ không bị dọn. <white>0</white> là tắt bảo vệ.",
   "menu.entry.grace.error": "<red>Phải nằm trong khoảng <white>{min}</white> đến <white>{max}</white> giây.",

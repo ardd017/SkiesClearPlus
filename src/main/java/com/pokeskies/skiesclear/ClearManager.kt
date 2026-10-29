@@ -63,7 +63,7 @@ class ClearManager {
                     Utils.printError("Failed to initialise clearable '$id': $e")
                 }
             }
-            val task = ClearTask(clearConfig)
+            val task = ClearTask(id, clearConfig)
             previous[id]?.let { task.carryOverTimerFrom(it) }
             clearTasks[id] = task
         }

@@ -39,18 +39,17 @@ class BaseCommand {
             BroadcastCommand().build(),
         )
 
-        for (alias in ALIASES) {
-            val root = Commands.literal(alias)
-                .requires(Permissions.require("skiesclear.command.base", 4))
-                .executes { ctx -> listClears(ctx.source) }
-                .build()
-            subCommands.forEach(root::addChild)
-            dispatcher.root.addChild(root)
-        }
+        val root = Commands.literal(ROOT_NAME)
+            .requires(Permissions.require("skiesclear.command.base", 4))
+            .executes { ctx -> listClears(ctx.source) }
+            .build()
+        subCommands.forEach(root::addChild)
+        dispatcher.root.addChild(root)
     }
 
     companion object {
-        private val ALIASES = listOf("skiesclear")
+        /** The literal players type. One entry, so there is no alias loop. */
+        private const val ROOT_NAME = "skiesclear"
 
         /** `/skiesclear` with no arguments lists every enabled clear entry and its remaining time. */
         fun listClears(source: CommandSourceStack): Int {

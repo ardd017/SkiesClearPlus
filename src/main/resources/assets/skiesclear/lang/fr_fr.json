@@ -123,7 +123,7 @@
   "menu.entry.interval.manual": "Secondes exactes",
   "menu.entry.interval.manual.tooltip": "<gray>Saisissez un nombre exact de secondes. Si vous modifiez le curseur et ce champ, ce champ l'emporte.",
   "menu.entry.interval.error": "<red>Doit être compris entre <white>{min}</white> et <white>{max}</white> secondes.",
-  "menu.clearable.rules.hint": "<gray>Une règle par ligne : un ID simple, <white>namespace:*</white> pour tout un namespace, <white>#tag=nom</white> pour un tag de scoreboard, ou <white>#nbt={\"NoAI\":1b}</white> pour les données d'entité. Cobblemon accepte aussi <white>#aspect=</white>, <white>#owned</white>, <white>#shiny</white> et d'autres drapeaux.",
+  "menu.clearable.rules.hint": "<gray>Une règle par ligne : un ID simple, <white>namespace:*</white> pour tout un namespace, <white>#tag=nom</white> pour un tag de scoreboard, ou <white>#nbt={\"NoAI\":1b}</white> pour les données d'entité (les nombres ont besoin d'un suffixe <white>b</white>/<white>s</white>/<white>l</white>/<white>f</white>/<white>d</white>). Cobblemon accepte aussi <white>#aspect=</white>, <white>#owned</white>, <white>#shiny</white> et d'autres drapeaux.",
   "menu.entry.grace": "Délai de grâce (secondes)",
   "menu.entry.grace.tooltip": "<gray>Les entités plus récentes ne sont jamais supprimées. <white>0</white> désactive la protection.",
   "menu.entry.grace.error": "<red>Doit être entre <white>{min}</white> et <white>{max}</white> secondes.",

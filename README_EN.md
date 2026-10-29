@@ -41,7 +41,8 @@ Everything below is new relative to upstream `1.1.2`:
   timer; only an actual `interval` change does.
 
 Plus a set of bug fixes — most notably a config serializer that used to blank out every
-`clearables` block on save, and a whitelist that consulted the blacklist. All of them are listed in
+`clearables` block on save, a whitelist that consulted the blacklist, and `#nbt=` rules that never
+matched anything because of bad type inference. All of them are listed in
 [ATTRIBUTION.md](ATTRIBUTION.md).
 
 ## Features

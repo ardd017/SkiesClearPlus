@@ -123,7 +123,7 @@
   "menu.entry.interval.manual": "Precise seconds",
   "menu.entry.interval.manual.tooltip": "<gray>Type an exact number of seconds. If you change both the slider and this field, this field wins.",
   "menu.entry.interval.error": "<red>Must be between <white>{min}</white> and <white>{max}</white> seconds.",
-  "menu.clearable.rules.hint": "<gray>One rule per line: a plain ID, <white>namespace:*</white> for a whole namespace, <white>#tag=name</white> for a scoreboard tag, or <white>#nbt={\"NoAI\":1b}</white> for entity data. Cobblemon entries also accept <white>#aspect=</white>, <white>#owned</white>, <white>#shiny</white> and other flags.",
+  "menu.clearable.rules.hint": "<gray>One rule per line: a plain ID, <white>namespace:*</white> for a whole namespace, <white>#tag=name</white> for a scoreboard tag, or <white>#nbt={\"NoAI\":1b}</white> for entity data (numbers need a <white>b</white>/<white>s</white>/<white>l</white>/<white>f</white>/<white>d</white> suffix). Cobblemon entries also accept <white>#aspect=</white>, <white>#owned</white>, <white>#shiny</white> and other flags.",
   "menu.entry.grace": "Grace period (seconds)",
   "menu.entry.grace.tooltip": "<gray>Entities younger than this are never cleared. <white>0</white> turns the guard off.",
   "menu.entry.grace.error": "<red>Must be between <white>{min}</white> and <white>{max}</white> seconds.",

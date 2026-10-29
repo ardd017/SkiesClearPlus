@@ -123,7 +123,7 @@
   "menu.entry.interval.manual": "Detik presisi",
   "menu.entry.interval.manual.tooltip": "<gray>Ketik jumlah detik yang tepat. Jika penggeser dan kolom ini sama-sama diubah, kolom ini yang dipakai.",
   "menu.entry.interval.error": "<red>Harus antara <white>{min}</white> dan <white>{max}</white> detik.",
-  "menu.clearable.rules.hint": "<gray>Satu aturan per baris: ID biasa, <white>namespace:*</white> untuk seluruh namespace, <white>#tag=nama</white> untuk tag papan skor, atau <white>#nbt={\"NoAI\":1b}</white> untuk data entitas. Cobblemon juga menerima <white>#aspect=</white>, <white>#owned</white>, <white>#shiny</white> dan flag lain.",
+  "menu.clearable.rules.hint": "<gray>Satu aturan per baris: ID biasa, <white>namespace:*</white> untuk seluruh namespace, <white>#tag=nama</white> untuk tag papan skor, atau <white>#nbt={\"NoAI\":1b}</white> untuk data entitas (angka perlu akhiran <white>b</white>/<white>s</white>/<white>l</white>/<white>f</white>/<white>d</white>). Cobblemon juga menerima <white>#aspect=</white>, <white>#owned</white>, <white>#shiny</white> dan flag lain.",
   "menu.entry.grace": "Masa tenggang (detik)",
   "menu.entry.grace.tooltip": "<gray>Entitas yang lebih baru dari ini tidak akan dibersihkan. <white>0</white> mematikan perlindungan.",
   "menu.entry.grace.error": "<red>Harus antara <white>{min}</white> dan <white>{max}</white> detik.",

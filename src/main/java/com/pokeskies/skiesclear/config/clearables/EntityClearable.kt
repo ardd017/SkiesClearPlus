@@ -38,8 +38,30 @@ class EntityClearable(
     override fun initialize() {
         blacklistedTags = generateTags(blacklist)
         whitelistedTags = generateTags(whitelist)
-        blacklistedNbt = generateNBT(blacklist)
-        whitelistedNbt = generateNBT(whitelist)
+        blacklistedNbt = generateNBT(blacklist, "blacklist")
+        whitelistedNbt = generateNBT(whitelist, "whitelist")
+        warnAboutUnreadableRules()
+    }
+
+    /**
+     * Points at rules that are syntactically fine but can never match.
+     *
+     * The commonest mistake is a value whose NBT width differs from the game's (`{"OnGround":0}`
+     * against a byte field), which fails silently because Java's `Tag` equality is class-sensitive.
+     * A rule that contains no recognisable prefix at all is reported too: `#nbt` without the `=` was
+     * silently ignored before and looked healthy in the config.
+     */
+    private fun warnAboutUnreadableRules() {
+        for ((label, rules) in listOf("blacklist" to blacklist, "whitelist" to whitelist)) {
+            for (entry in rules) {
+                if (!entry.startsWith("#nbt=", ignoreCase = true) && !entry.startsWith("#tag=", ignoreCase = true)) {
+                    Utils.printWarn(
+                        "Rule '$entry' in the $label has no '#nbt=' or '#tag=' prefix, so it is " +
+                            "matched as a plain id instead. Check whether that is intended."
+                    )
+                }
+            }
+        }
     }
 
     override fun getResourceLocation(entity: Entity): ResourceLocation {
@@ -122,15 +144,19 @@ class EntityClearable(
         }
     }
 
-    private fun generateNBT(list: List<String>): List<CompoundTag> {
+    private fun generateNBT(list: List<String>, label: String): List<CompoundTag> {
         return list.mapNotNull { entry ->
             if (!entry.startsWith("#nbt=", ignoreCase = true)) return@mapNotNull null
             val raw = entry.split("=", limit = 2).getOrNull(1)?.trim()
             if (raw.isNullOrEmpty()) return@mapNotNull null
             try {
-                SkiesClear.INSTANCE.gson.fromJson(raw, CompoundTag::class.java)
+                val parsed = SkiesClear.INSTANCE.gson.fromJson(raw, CompoundTag::class.java)
+                if (parsed == null) {
+                    Utils.printError("Empty #nbt rule in the $label: '$raw'")
+                }
+                parsed
             } catch (e: Exception) {
-                Utils.printError("Invalid #nbt rule '$raw': ${e.message}")
+                Utils.printError("Invalid #nbt rule in the $label: '$raw' — ${e.message}")
                 null
             }
         }

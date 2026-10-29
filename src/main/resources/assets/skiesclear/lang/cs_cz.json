@@ -123,7 +123,7 @@
   "menu.entry.interval.manual": "Přesné sekundy",
   "menu.entry.interval.manual.tooltip": "<gray>Zadejte přesný počet sekund. Pokud změníte posuvník i toto pole, platí toto pole.",
   "menu.entry.interval.error": "<red>Musí být mezi <white>{min}</white> a <white>{max}</white> sekundami.",
-  "menu.clearable.rules.hint": "<gray>Jedno pravidlo na řádek: prosté ID, <white>namespace:*</white> pro celý namespace, <white>#tag=název</white> pro scoreboard tag nebo <white>#nbt={\"NoAI\":1b}</white> pro data entity. Cobblemon přijímá i <white>#aspect=</white>, <white>#owned</white>, <white>#shiny</white> a další příznaky.",
+  "menu.clearable.rules.hint": "<gray>Jedno pravidlo na řádek: prosté ID, <white>namespace:*</white> pro celý namespace, <white>#tag=název</white> pro scoreboard tag nebo <white>#nbt={\"NoAI\":1b}</white> pro data entity (čísla potřebují příponu <white>b</white>/<white>s</white>/<white>l</white>/<white>f</white>/<white>d</white>). Cobblemon přijímá i <white>#aspect=</white>, <white>#owned</white>, <white>#shiny</white> a další příznaky.",
   "menu.entry.grace": "Ochranná lhůta (sekundy)",
   "menu.entry.grace.tooltip": "<gray>Entity mladší než tato hodnota se nikdy nemažou. <white>0</white> ochranu vypne.",
   "menu.entry.grace.error": "<red>Musí být mezi <white>{min}</white> a <white>{max}</white> sekundami.",

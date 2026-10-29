@@ -123,7 +123,7 @@
   "menu.entry.interval.manual": "精确秒数",
   "menu.entry.interval.manual.tooltip": "<gray>直接输入确切的秒数。滑块和这里都改过时，以这里为准。",
   "menu.entry.interval.error": "<red>必须在 <white>{min}</white> 到 <white>{max}</white> 秒之间。",
-  "menu.clearable.rules.hint": "<gray>每行一条规则：直接写 ID 精确匹配，<white>命名空间:*</white> 匹配整个命名空间，<white>#tag=名字</white> 匹配计分板标签，<white>#nbt={\"NoAI\":1b}</white> 匹配实体数据。Cobblemon 还支持 <white>#aspect=</white>、<white>#owned</white>、<white>#shiny</white> 等旗标。",
+  "menu.clearable.rules.hint": "<gray>每行一条规则：直接写 ID 精确匹配，<white>命名空间:*</white> 匹配整个命名空间，<white>#tag=名字</white> 匹配计分板标签，<white>#nbt={\"NoAI\":1b}</white> 匹配实体数据（数字要带 <white>b</white>/<white>s</white>/<white>l</white>/<white>f</white>/<white>d</white> 后缀）。Cobblemon 还支持 <white>#aspect=</white>、<white>#owned</white>、<white>#shiny</white> 等旗标。",
   "menu.entry.grace": "保护期（秒）",
   "menu.entry.grace.tooltip": "<gray>比这个时间更年轻的实体不会被清理。<white>0</white> 表示关闭保护。",
   "menu.entry.grace.error": "<red>必须在 <white>{min}</white> 到 <white>{max}</white> 秒之间。",

@@ -123,7 +123,7 @@
   "menu.entry.interval.manual": "Tam saniye",
   "menu.entry.interval.manual.tooltip": "<gray>Kesin saniye sayısını yazın. Hem kaydırıcıyı hem bu alanı değiştirirseniz bu alan geçerli olur.",
   "menu.entry.interval.error": "<red><white>{min}</white> ile <white>{max}</white> saniye arasında olmalı.",
-  "menu.clearable.rules.hint": "<gray>Her satır bir kural: düz ID, tüm ad alanı için <white>namespace:*</white>, skorboard etiketi için <white>#tag=ad</white> veya varlık verisi için <white>#nbt={\"NoAI\":1b}</white>. Cobblemon ayrıca <white>#aspect=</white>, <white>#owned</white>, <white>#shiny</white> gibi bayrakları da kabul eder.",
+  "menu.clearable.rules.hint": "<gray>Her satır bir kural: düz ID, tüm ad alanı için <white>namespace:*</white>, skorboard etiketi için <white>#tag=ad</white> veya varlık verisi için <white>#nbt={\"NoAI\":1b}</white> (sayılar <white>b</white>/<white>s</white>/<white>l</white>/<white>f</white>/<white>d</white> sonekini gerektirir). Cobblemon ayrıca <white>#aspect=</white>, <white>#owned</white>, <white>#shiny</white> gibi bayrakları da kabul eder.",
   "menu.entry.grace": "Koruma süresi (saniye)",
   "menu.entry.grace.tooltip": "<gray>Bundan yeni varlıklar asla temizlenmez. <white>0</white> korumayı kapatır.",
   "menu.entry.grace.error": "<red><white>{min}</white> ile <white>{max}</white> saniye arasında olmalı.",

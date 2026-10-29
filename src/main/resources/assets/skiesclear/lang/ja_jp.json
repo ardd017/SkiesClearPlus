@@ -123,7 +123,7 @@
   "menu.entry.interval.manual": "秒数を直接入力",
   "menu.entry.interval.manual.tooltip": "<gray>正確な秒数を入力します。スライダーと両方を変更した場合はこちらが優先されます。",
   "menu.entry.interval.error": "<red><white>{min}</white> ～ <white>{max}</white> 秒の範囲で指定してください。",
-  "menu.clearable.rules.hint": "<gray>1 行に 1 ルール：ID そのまま、<white>名前空間:*</white> で名前空間全体、<white>#tag=name</white> でスコアボードタグ、<white>#nbt={\"NoAI\":1b}</white> でエンティティデータ。Cobblemon は <white>#aspect=</white>、<white>#owned</white>、<white>#shiny</white> などのフラグにも対応。",
+  "menu.clearable.rules.hint": "<gray>1 行に 1 ルール：ID そのまま、<white>名前空間:*</white> で名前空間全体、<white>#tag=name</white> でスコアボードタグ、<white>#nbt={\"NoAI\":1b}</white> でエンティティデータ（数値には <white>b</white>/<white>s</white>/<white>l</white>/<white>f</white>/<white>d</white> の接尾辞が必要）。Cobblemon は <white>#aspect=</white>、<white>#owned</white>、<white>#shiny</white> などのフラグにも対応。",
   "menu.entry.grace": "保護時間（秒）",
   "menu.entry.grace.tooltip": "<gray>これより新しいエンティティは削除されません。<white>0</white> で無効。",
   "menu.entry.grace.error": "<red><white>{min}</white> ～ <white>{max}</white> 秒の範囲で指定してください。",

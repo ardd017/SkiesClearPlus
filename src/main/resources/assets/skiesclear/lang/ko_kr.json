@@ -123,7 +123,7 @@
   "menu.entry.interval.manual": "정확한 초 입력",
   "menu.entry.interval.manual.tooltip": "<gray>정확한 초를 직접 입력합니다. 슬라이더와 이 항목을 모두 바꾸면 이 값이 우선합니다.",
   "menu.entry.interval.error": "<red><white>{min}</white>~<white>{max}</white>초 사이여야 합니다.",
-  "menu.clearable.rules.hint": "<gray>한 줄에 규칙 하나: ID 그대로, <white>네임스페이스:*</white>는 네임스페이스 전체, <white>#tag=이름</white>은 스코어보드 태그, <white>#nbt={\"NoAI\":1b}</white>는 엔티티 데이터. Cobblemon은 <white>#aspect=</white>, <white>#owned</white>, <white>#shiny</white> 같은 플래그도 지원합니다.",
+  "menu.clearable.rules.hint": "<gray>한 줄에 규칙 하나: ID 그대로, <white>네임스페이스:*</white>는 네임스페이스 전체, <white>#tag=이름</white>은 스코어보드 태그, <white>#nbt={\"NoAI\":1b}</white>는 엔티티 데이터(숫자에는 <white>b</white>/<white>s</white>/<white>l</white>/<white>f</white>/<white>d</white> 접미사가 필요합니다). Cobblemon은 <white>#aspect=</white>, <white>#owned</white>, <white>#shiny</white> 같은 플래그도 지원합니다.",
   "menu.entry.grace": "보호 시간(초)",
   "menu.entry.grace.tooltip": "<gray>이 시간보다 최근에 생성된 엔티티는 정리되지 않습니다. <white>0</white>이면 보호가 꺼집니다.",
   "menu.entry.grace.error": "<red><white>{min}</white>초에서 <white>{max}</white>초 사이여야 합니다.",

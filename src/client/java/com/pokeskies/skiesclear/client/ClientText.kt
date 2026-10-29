@@ -56,7 +56,7 @@ object ClientText {
     /** Parses an already-resolved string (a config value holding MiniMessage, for instance). */
     fun raw(text: String, locale: String? = null): Component {
         val resolved = locale ?: screenLocale()
-        val expanded = I18n.applyPlaceholders(I18n.expandLangTags(text, resolved), emptyMap())
+        val expanded = I18n.expandLangTags(text, resolved)
         return runCatching { audiences.toNative(com.pokeskies.skiesclear.utils.Utils.miniMessage.deserialize(expanded)) }
             .getOrElse { Component.literal(expanded) }
     }
@@ -64,7 +64,6 @@ object ClientText {
     /** Same as [of], but plain text -- handy for `setTextGetter` and friends. */
     fun plain(key: String, placeholders: Map<String, String> = emptyMap(), locale: String? = null): String {
         val resolved = locale ?: screenLocale()
-        val line = I18n.translate(key, resolved, placeholders)
-        return I18n.applyPlaceholders(I18n.expandLangTags(line, resolved), emptyMap())
+        return I18n.expandLangTags(I18n.translate(key, resolved, placeholders), resolved)
     }
 }
