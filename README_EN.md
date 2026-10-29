@@ -206,16 +206,6 @@ Any message inside `config.json` may reference a language key with the `<lang:..
 
 Arguments are supported: `<lang:command.force.success id="example">`.
 
-## Planned Features
-
-- Command hooks (run configured commands before/after a clear — upstream issue #1)
-- Create and delete clear entries from the settings menu
-- BossBar countdown
-- Clear statistics (how many, when)
-- Protect entities near players
-
-Suggestions are welcome as issues.
-
 ## Support
 
 Open an issue in [this repository](../../issues). The upstream Discord is unrelated to this fork and

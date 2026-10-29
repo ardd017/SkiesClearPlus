@@ -192,16 +192,6 @@ Kotlin `object` 编译出的类构造函数是 **private**，而 Fabric 的默�
 
 支持传参：`<lang:command.force.success id="example">`。
 
-## 计划中的功能
-
-- 命令 hook（清理前后执行配置里的命令，见上游 issue #1）
-- 在菜单里新建 / 删除清理项
-- BossBar 倒计时
-- 清理统计（上次清了多少、什么时候）
-- 玩家附近的实体保护
-
-有想法欢迎提 issue。
-
 ## 问题反馈
 
 请在本仓库的 [Issues](../../issues) 提出。上游的 Discord 与本分支无关，那边的讨论本分支看不到。
