@@ -1,7 +1,17 @@
+/*
+ * SkiesClear Plus — a fork of SkiesClear by PokeSkies (https://github.com/PokeSkies/SkiesClear).
+ *
+ * Original code Copyright PokeSkies, licensed under the Apache License 2.0.
+ * Modifications for SkiesClear Plus Copyright 2026 ardd_017, licensed under the Apache License 2.0.
+ *
+ * This file has been MODIFIED from the upstream SkiesClear source. See ATTRIBUTION.md for the
+ * list of changes.
+ */
 package com.pokeskies.skiesclear
 
 import com.pokeskies.skiesclear.config.ClearConfig
 import com.pokeskies.skiesclear.config.clearables.Clearable
+import com.pokeskies.skiesclear.utils.I18n
 import com.pokeskies.skiesclear.utils.Utils
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.MinecraftServer
@@ -10,105 +20,238 @@ import net.minecraft.server.level.ServerPlayer
 import net.minecraft.sounds.SoundEvent
 import net.minecraft.sounds.SoundSource
 
+/**
+ * Drives one entry from `config.json`.
+ *
+ * Everything that can be resolved ahead of time is resolved in the constructor: the sound ids, the
+ * set of seconds at which a warning fires, and the placeholder keys contributed by each clearable.
+ * `tick` runs about once a second per task, so the hot path is one `Int` set lookup and, only on a
+ * warning second, one map lookup.
+ *
+ * Text is rendered per reader. Placeholder values such as `%time_remaining%` are built inside the
+ * rendering loop because "5 minutes" differs per language.
+ */
 class ClearTask(
     val clearConfig: ClearConfig
 ) {
     private var dimensions: List<ServerLevel>? = null
-    private var timer = clearConfig.interval
+    private var timer: Int = clearConfig.interval
+
+    /**
+     * The interval this task was built from, frozen at construction time.
+     *
+     * Cannot be read back off [clearConfig]: the settings menus mutate that very object in place, so
+     * by the time a reload happens the old task's `clearConfig.interval` already holds the new value
+     * and a before/after comparison would always look unchanged. See [carryOverTimerFrom].
+     */
+    private val baseInterval: Int = clearConfig.interval
+
+    private val clearSound: SoundEvent? = resolveSound(clearConfig.sounds.clear)
+
+    /** Warning sounds keyed by the seconds remaining at which they fire. */
+    private val warningSounds: Map<Int, Pair<SoundEvent, ClearConfig.Sounds.SoundSettings>> =
+        buildMap {
+            for ((rawKey, settings) in clearConfig.sounds.warnings) {
+                val at = rawKey.toIntOrNull() ?: continue
+                val event = resolveSound(settings) ?: continue
+                put(at, event to settings)
+            }
+        }
+
+    private val warningMessageKeys: Set<Int> =
+        clearConfig.messages.warnings.keys.mapNotNullTo(LinkedHashSet()) { it.toIntOrNull() }
+
+    /** Every second at which *something* happens, so idle ticks stay cheap. */
+    private val warningTicks: Set<Int> = buildSet {
+        addAll(warningMessageKeys)
+        addAll(warningSounds.keys)
+        addAll(clearConfig.warningSeconds)
+    }
+
+    // ------------------------------------------------------------------ clearing
 
     fun runClear(server: MinecraftServer, broadcast: Boolean): Int {
         val levels = getLevels(server)
-        val totals = clearConfig.clearables.map { (id, clearable) ->
-            clearable to clearable.clearEntities(clearConfig, levels)
-        }.toMap()
-
+        val totals = LinkedHashMap<Clearable<*>, Int>(clearConfig.clearables.size)
+        for ((_, clearable) in clearConfig.clearables) {
+            totals[clearable] = clearable.clearEntities(clearConfig, levels)
+        }
         val total = totals.values.sum()
-        if (broadcast && (clearConfig.messages.clear.isNotEmpty() || clearConfig.sounds.clear != null)) {
-            for (player in server.playerList.players.filter { shouldInform(it) }) {
-                for (line in clearConfig.messages.clear) {
-                    player.sendSystemMessage(Utils.deserializeText(parsePlaceholders(line, total, totals)))
-                }
-                if (clearConfig.sounds.clear != null && clearConfig.sounds.clear.sound.isNotEmpty()) {
-                    player.playNotifySound(
-                        SoundEvent.createVariableRangeEvent(ResourceLocation.parse(clearConfig.sounds.clear.sound)),
-                        SoundSource.MASTER,
-                        clearConfig.sounds.clear.volume,
-                        clearConfig.sounds.clear.pitch
-                    )
-                }
+        if (!broadcast) return total
+
+        val lines = clearConfig.messages.clear
+        if (lines.isEmpty() && clearSound == null) return total
+
+        val recipients = server.playerList.players.filter { shouldInform(it) }
+        if (recipients.isEmpty()) return total
+
+        Utils.broadcast(recipients, lines) { locale ->
+            placeholders(total, totals, clearConfig.interval.toLong(), locale)
+        }
+
+        val soundSettings = clearConfig.sounds.clear
+        val soundEvent = clearSound
+        if (soundEvent != null && soundSettings != null) {
+            for (player in recipients) {
+                player.playNotifySound(soundEvent, SoundSource.MASTER, soundSettings.volume, soundSettings.pitch)
             }
         }
         return total
     }
 
     fun tick(server: MinecraftServer) {
-        val warningMessage: List<String>? = clearConfig.messages.warnings[timer.toString()]
-        if (warningMessage != null) {
-            for (player in server.playerList.players.filter { shouldInform(it) }) {
-                for (line in warningMessage) {
-                    player.sendSystemMessage(
-                        Utils.deserializeText(
-                            line.replace(
-                                "%time_remaining%".toRegex(),
-                                Utils.getFormattedTime(timer.toLong())
-                            )
-                        )
-                    )
-                }
-            }
-        }
-        val warningSound: ClearConfig.Sounds.SoundSettings? = clearConfig.sounds.warnings[timer.toString()]
-        if (warningSound != null && warningSound.sound.isNotEmpty()) {
-            for (player in server.playerList.players.filter { shouldInform(it) }) {
-                player.playNotifySound(
-                    SoundEvent.createVariableRangeEvent(ResourceLocation.parse(warningSound.sound)),
-                    SoundSource.MASTER,
-                    warningSound.volume,
-                    warningSound.pitch
-                )
-            }
-        }
-        if (timer-- <= 0) {
+        if (timer in warningTicks) dispatchWarning(server)
+
+        if (timer <= 0) {
             resetTimer()
             runClear(server, true)
+        } else {
+            timer--
         }
     }
 
-    private fun getLevels(server: MinecraftServer): List<ServerLevel> {
-        if (dimensions != null) return dimensions!!
-        var newDimensions = mutableListOf<ServerLevel>()
-        for (level in server.allLevels) {
-            if (clearConfig.dimensions.contains(level.dimension().location().toString())) {
-                newDimensions.add(level)
+    private fun dispatchWarning(server: MinecraftServer) {
+        // An explicit override wins; otherwise the shared `default` template is used when the second
+        // came from `warning_seconds` rather than from an explicit entry in `messages.warnings`.
+        val lines = clearConfig.messages.warnings[timer.toString()]
+            ?: clearConfig.messages.warnings[DEFAULT_WARNING_KEY]
+            ?: if (timer in warningMessageKeys) ClearConfig.DEFAULT_WARNING else null
+        val sound = warningSounds[timer]
+        if (lines == null && sound == null) return
+
+        val recipients = server.playerList.players.filter { shouldInform(it) }
+        if (recipients.isEmpty()) return
+
+        if (lines != null) {
+            Utils.broadcast(recipients, lines) { locale ->
+                placeholders(0, emptyMap(), timer.toLong(), locale)
             }
         }
-        if (newDimensions.isEmpty()) newDimensions = server.allLevels.toMutableList()
-        dimensions = newDimensions
-        return newDimensions
+
+        if (sound != null) {
+            val (event, settings) = sound
+            for (player in recipients) {
+                player.playNotifySound(event, SoundSource.MASTER, settings.volume, settings.pitch)
+            }
+        }
     }
 
-    private fun shouldInform(player: ServerPlayer): Boolean {
-        return !clearConfig.informDimensionsOnly || clearConfig.dimensions.isEmpty() ||
-            player.level().dimension().location().toString() in clearConfig.dimensions
+    // ------------------------------------------------------------------ placeholders
+
+    /**
+     * Builds the placeholder map for one reader.
+     *
+     * @param total      how many objects the clear removed
+     * @param cleared    per-clearable counts, keyed by [Clearable.getPlaceholderKey]
+     * @param remaining  seconds shown through `%time_remaining%`; defaults to the live timer
+     * @param locale     language used for the human-readable duration
+     */
+    fun placeholders(
+        total: Int,
+        cleared: Map<Clearable<*>, Int>,
+        remaining: Long? = null,
+        locale: String? = null
+    ): Map<String, String> {
+        val resolved = locale ?: I18n.serverLocale()
+        val seconds = remaining ?: timer.toLong()
+        val map = LinkedHashMap<String, String>(cleared.size + 8)
+        val name = displayName(resolved)
+        map["clear"] = name
+        map["id"] = name
+        map["clear_amount"] = total.toString()
+        map["clear_time"] = Utils.getFormattedTime(clearConfig.interval.toLong(), resolved)
+        map["interval_seconds"] = clearConfig.interval.toString()
+        map["time_remaining"] = Utils.getFormattedTime(seconds, resolved)
+        map["remaining_seconds"] = seconds.toString()
+        for ((clearable, amount) in cleared) {
+            map[clearable.getPlaceholderKey()] = amount.toString()
+        }
+        // Clearables that were not part of this clear still resolve, so a template never shows `{key}`.
+        for ((_, clearable) in clearConfig.clearables) {
+            map.putIfAbsent(clearable.getPlaceholderKey(), "0")
+        }
+        return map
     }
 
-    fun getTimer(): Int {
-        return timer
+    /**
+     * Display name of this entry.
+     *
+     * `display_name` in the config wins. When it is absent we fall back to the localised
+     * `<lang:message.clear.unnamed>` label instead of a hardcoded English word, so an entry without
+     * a name still reads correctly for every player.
+     */
+    fun displayName(locale: String? = null): String {
+        val configured = clearConfig.displayName
+        if (configured.isNotBlank()) return configured
+        return I18n.raw(DEFAULT_NAME_KEY, locale) ?: DEFAULT_NAME_FALLBACK
     }
+
+    // ------------------------------------------------------------------ state
+
+    fun getLevels(server: MinecraftServer): List<ServerLevel> {
+        dimensions?.let { return it }
+        var resolved = server.allLevels.filter {
+            clearConfig.dimensions.contains(it.dimension().location().toString())
+        }
+        if (resolved.isEmpty()) resolved = server.allLevels.toList()
+        dimensions = resolved
+        return resolved
+    }
+
+    fun shouldInform(player: ServerPlayer): Boolean {
+        if (!clearConfig.informDimensionsOnly) return true
+        if (clearConfig.dimensions.isEmpty()) return true
+        return player.level().dimension().location().toString() in clearConfig.dimensions
+    }
+
+    fun getTimer(): Int = timer
 
     fun resetTimer() {
         timer = clearConfig.interval
     }
 
-    private fun parsePlaceholders(string: String, total: Int, cleared: Map<Clearable<*>, Int>): String {
-        var parsed = string
-            .replace("%clear_time%".toRegex(), Utils.getFormattedTime(clearConfig.interval.toLong()))
-            .replace("%clear_amount%".toRegex(), total.toString())
+    /**
+     * Keeps the countdown from [previous] when the interval is unchanged.
+     *
+     * [ClearManager.reload] rebuilds every task object, which would otherwise restart the timer on
+     * a language switch or a settings save. A changed interval is a deliberate request for a new
+     * cadence, so that case starts over; a shortened interval also has to start over, otherwise the
+     * remaining time could exceed the new ceiling.
+     *
+     * The comparison uses [baseInterval] on both sides — the live `clearConfig.interval` is the same
+     * mutated object for both tasks by the time this runs.
+     */
+    fun carryOverTimerFrom(previous: ClearTask) {
+        if (previous === this) return
+        if (previous.baseInterval != baseInterval) return
+        timer = previous.timer.coerceIn(0, baseInterval)
+    }
 
-        cleared.forEach { (clearable, amount) ->
-            parsed = clearable.parse(parsed, amount)
+    /** Invalidates the cached level list, e.g. when `/reload` recreates the task. */
+    fun invalidateLevels() {
+        dimensions = null
+    }
+
+    // ------------------------------------------------------------------ helpers
+
+    private fun resolveSound(settings: ClearConfig.Sounds.SoundSettings?): SoundEvent? {
+        if (settings == null || settings.sound.isEmpty()) return null
+        return try {
+            SoundEvent.createVariableRangeEvent(ResourceLocation.parse(settings.sound))
+        } catch (e: Exception) {
+            Utils.printWarn("Invalid sound id '${settings.sound}': ${e.message}")
+            null
         }
+    }
 
-        return parsed
+    companion object {
+        /** Config key used for the shared warning template when a specific second has no override. */
+        const val DEFAULT_WARNING_KEY: String = "default"
+
+        /** Used when an entry has no `display_name`, so `%clear%` is never empty. */
+        private const val DEFAULT_NAME_KEY: String = "message.clear.unnamed"
+
+        /** Last-resort label when even the language file is unreadable. */
+        private const val DEFAULT_NAME_FALLBACK: String = "unnamed"
     }
 }

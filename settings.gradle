@@ -1,5 +1,18 @@
 pluginManagement {
     repositories {
+        // Mirrors first: the upstream hosts below are reachable but rate-limited to a few KB/s here.
+        maven {
+            name = 'AliyunGradlePlugin'
+            url = 'https://maven.aliyun.com/repository/gradle-plugin'
+        }
+        maven {
+            name = 'TencentPublic'
+            url = 'https://mirrors.cloud.tencent.com/nexus/repository/maven-public/'
+        }
+        maven {
+            name = 'AliyunPublic'
+            url = 'https://maven.aliyun.com/repository/public'
+        }
         maven {
             name = 'Fabric'
             url = 'https://maven.fabricmc.net/'
@@ -12,3 +25,5 @@ pluginManagement {
         }
     }
 }
+
+rootProject.name = "SkiesClearPlus"

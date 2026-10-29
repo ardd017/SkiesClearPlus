@@ -1,12 +1,21 @@
+/*
+ * SkiesClear Plus — a fork of SkiesClear by PokeSkies (https://github.com/PokeSkies/SkiesClear).
+ *
+ * Original code Copyright PokeSkies, licensed under the Apache License 2.0.
+ * Modifications for SkiesClear Plus Copyright 2026 ardd_017, licensed under the Apache License 2.0.
+ *
+ * This file has been MODIFIED from the upstream SkiesClear source. See ATTRIBUTION.md for the
+ * list of changes.
+ */
 package com.pokeskies.skiesclear.commands.subcommands
 
 import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.tree.LiteralCommandNode
 import com.pokeskies.skiesclear.SkiesClear
+import com.pokeskies.skiesclear.utils.I18n
 import com.pokeskies.skiesclear.utils.SubCommand
+import com.pokeskies.skiesclear.utils.Utils
 import me.lucko.fabric.api.permissions.v0.Permissions
-import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.format.NamedTextColor
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.Commands
 
@@ -21,7 +30,11 @@ class ReloadCommand : SubCommand {
     companion object {
         fun reload(ctx: CommandContext<CommandSourceStack>): Int {
             SkiesClear.INSTANCE.reload()
-            ctx.source.sendMessage(Component.text("Reloaded SkiesClear").color(NamedTextColor.GREEN))
+            Utils.sendLocalized(
+                ctx.source,
+                "command.reload.success",
+                mapOf("count" to I18n.availableLocales.size.toString())
+            )
             return 1
         }
     }

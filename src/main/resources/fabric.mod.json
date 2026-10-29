@@ -2,17 +2,31 @@
   "schemaVersion": 1,
   "id": "${id}",
   "version": "${version}",
-  "name": "SkiesClear",
-  "description": "",
-  "authors": [],
+  "name": "SkiesClear Plus",
+  "description": "Fork of SkiesClear by PokeSkies. A server-sided entity clearing mod with an in-game settings menu, per-player localized messages and join announcements. Ships 21 languages. See ATTRIBUTION.md for the full list of changes from upstream.",
+  "authors": [
+    "PokeSkies",
+    "ardd_017"
+  ],
+  "contributors": [
+    "ardd_017"
+  ],
   "contact": {
-    "repo": "https://github.com/PokeSkies/SkiesClear"
+    "homepage": "https://github.com/PokeSkies/SkiesClear",
+    "sources": "https://github.com/PokeSkies/SkiesClear",
+    "issues": "https://github.com/PokeSkies/SkiesClear/issues"
   },
-  "license": "All-Rights-Reserved",
+  "license": "Apache-2.0",
   "environment": "*",
   "entrypoints": {
     "main": [
       "com.pokeskies.skiesclear.SkiesClear"
+    ],
+    "client": [
+      "com.pokeskies.skiesclear.client.SkiesClearClient"
+    ],
+    "modmenu": [
+      "com.pokeskies.skiesclear.client.SkiesClearModMenu"
     ]
   },
   "depends": {
@@ -22,5 +36,9 @@
     "fabric": "*",
     "fabric-language-kotlin": ">=1.11.0",
     "fabric-permissions-api-v0": "*"
+  },
+  "recommends": {
+    "cloth-config": ">=15.0.0",
+    "modmenu": ">=11.0.0"
   }
 }

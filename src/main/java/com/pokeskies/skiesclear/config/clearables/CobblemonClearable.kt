@@ -1,3 +1,12 @@
+/*
+ * SkiesClear Plus — a fork of SkiesClear by PokeSkies (https://github.com/PokeSkies/SkiesClear).
+ *
+ * Original code Copyright PokeSkies, licensed under the Apache License 2.0.
+ * Modifications for SkiesClear Plus Copyright 2026 ardd_017, licensed under the Apache License 2.0.
+ *
+ * This file has been MODIFIED from the upstream SkiesClear source. See ATTRIBUTION.md for the
+ * list of changes.
+ */
 package com.pokeskies.skiesclear.config.clearables
 
 import com.cobblemon.mod.common.entity.pokemon.PokemonEntity
@@ -12,15 +21,12 @@ class CobblemonClearable(
     enabled: Boolean = true,
     blacklist: List<String> = emptyList(),
     whitelist: List<String> = emptyList()
-): Clearable<PokemonEntity>(enabled, blacklist, whitelist) {
-    @Transient
-    private lateinit var blacklistedAspects: List<String>
-    @Transient
-    private lateinit var whitelistedAspects: List<String>
-    @Transient
-    private lateinit var blacklistedTags: List<String>
-    @Transient
-    private lateinit var whitelistedTags: List<String>
+) : Clearable<PokemonEntity>(enabled, blacklist, whitelist) {
+
+    private var blacklistedAspects: List<String> = emptyList()
+    private var whitelistedAspects: List<String> = emptyList()
+    private var blacklistedTags: List<String> = emptyList()
+    private var whitelistedTags: List<String> = emptyList()
 
     override fun initialize() {
         blacklistedAspects = generateAspects(blacklist)
@@ -42,126 +48,104 @@ class CobblemonClearable(
                     if (entity.isPersistenceRequired && !clearConfig.clearPersistent) return@filter false
                     if (entity.hasCustomName() && !clearConfig.clearNamed) return@filter false
                     if (entity.isPassenger && !clearConfig.clearPassengers) return@filter false
+                    if (isWithinGrace(entity, clearConfig)) return@filter false
                     return@filter shouldClear(entity)
                 }
                 entities.forEach { entity -> entity.remove(Entity.RemovalReason.KILLED) }
                 removalCount += entities.size
             } catch (exception: Exception) {
-                Utils.printError("An exception was thrown while attempting to clear entities: + $exception")
-                exception.printStackTrace()
+                Utils.printError("An exception was thrown while attempting to clear pokemon: $exception")
             }
         }
         return removalCount
     }
 
     override fun isBlacklisted(entity: PokemonEntity, id: ResourceLocation): Boolean {
-        val pokemon = entity.pokemon
-        if ((pokemon.isPlayerOwned() || pokemon.isNPCOwned()) && blacklist.contains("#owned")) return true
-        if (entity.isBattling && blacklist.contains("#battling")) return true
-        if (pokemon.shiny && blacklist.contains("#shiny")) return true
-        if (pokemon.isLegendary() && blacklist.contains("#legendary")) return true
-        if (pokemon.isMythical() && blacklist.contains("#mythical")) return true
-        if (pokemon.isUltraBeast() && blacklist.contains("#ultrabeast")) return true
-        if (entity.isBusy && blacklist.contains("#busy")) return true
-        if (entity.isUncatchable() && blacklist.contains("#uncatchable")) return true
-
-        // Species matching
-        if (blacklist.stream().anyMatch { species: String ->
-                id.toString().equals(species, ignoreCase = true)
-            }) return true
-
-        // Aspect matching
-        if (blacklistedAspects.isNotEmpty()) {
-            if (pokemon.aspects.isNotEmpty()) {
-                if (pokemon.aspects.stream().anyMatch { pokemonAspect: String ->
-                        blacklistedAspects.contains(
-                            pokemonAspect
-                        )
-                    }) return true
-            }
-        }
-
-        // Tag matching
-        if (blacklistedTags.isNotEmpty()) {
-            if (entity.tags.isNotEmpty()) {
-                if (entity.tags.stream().anyMatch { pokemonTag: String ->
-                        blacklistedTags.contains(pokemonTag)
-                    }) return true
-            }
-        }
-
-        return false
+        if (matchesFlags(entity, blacklist)) return true
+        if (matchesSpecies(entity, blacklist)) return true
+        if (matchesAspects(entity, blacklistedAspects)) return true
+        if (matchesTags(entity, blacklistedTags)) return true
+        return super.isBlacklisted(entity, id)
     }
 
     override fun isWhitelisted(entity: PokemonEntity, id: ResourceLocation): Boolean {
+        // NOTE: this used to consult `blacklist` for #busy / #uncatchable, which made the whitelist
+        // fire on entries that were meant to exclude a pokemon.
+        if (matchesFlags(entity, whitelist)) return true
+        if (matchesSpecies(entity, whitelist)) return true
+        if (matchesAspects(entity, whitelistedAspects)) return true
+        if (matchesTags(entity, whitelistedTags)) return true
+        return super.isWhitelisted(entity, id)
+    }
+
+    private fun matchesFlags(entity: PokemonEntity, rules: List<String>): Boolean {
+        if (rules.isEmpty()) return false
         val pokemon = entity.pokemon
-        if ((pokemon.isPlayerOwned() || pokemon.isNPCOwned()) && whitelist.contains("#owned")) return true
-        if (entity.isBattling && whitelist.contains("#battling")) return true
-        if (pokemon.shiny && whitelist.contains("#shiny")) return true
-        if (pokemon.isLegendary() && whitelist.contains("#legendary")) return true
-        if (pokemon.isMythical() && whitelist.contains("#mythical")) return true
-        if (pokemon.isUltraBeast() && whitelist.contains("#ultrabeast")) return true
-        if (entity.isBusy && blacklist.contains("#busy")) return true
-        if (entity.isUncatchable() && blacklist.contains("#uncatchable")) return true
-
-        // Species matching
-        if (whitelist.stream().anyMatch { species: String ->
-                pokemon.species.resourceIdentifier.toString().equals(species, ignoreCase = true)
-            }) return true
-
-        // Aspect matching
-        if (whitelistedAspects.isNotEmpty()) {
-            if (pokemon.aspects.isNotEmpty()) {
-                if (pokemon.aspects.stream().anyMatch { pokemonAspect: String ->
-                        whitelistedAspects.contains(
-                            pokemonAspect
-                        )
-                    }) return true
+        for (rule in rules) {
+            val hit = when (rule.lowercase()) {
+                "#owned" -> pokemon.isPlayerOwned() || pokemon.isNPCOwned()
+                "#battling" -> entity.isBattling
+                "#shiny" -> pokemon.shiny
+                "#legendary" -> pokemon.isLegendary()
+                "#mythical" -> pokemon.isMythical()
+                "#ultrabeast" -> pokemon.isUltraBeast()
+                "#busy" -> entity.isBusy
+                "#uncatchable" -> entity.isUncatchable()
+                else -> continue
             }
+            if (hit) return true
         }
-
-        // Tag matching
-        if (whitelistedTags.isNotEmpty()) {
-            if (entity.tags.isNotEmpty()) {
-                if (entity.tags.stream().anyMatch { pokemonTag: String ->
-                        whitelistedTags.contains(pokemonTag)
-                    }) return true
-            }
-        }
-
         return false
     }
 
-    override fun getPlaceholder(): String {
-        return "%clear_amount_pokemon%"
-    }
-
-    private fun generateAspects(list: List<String>): List<String> {
-        val newAspects = mutableListOf<String>()
-        for (entry in list) {
-            if (entry.startsWith("#aspect=", true)) {
-                // split the entry string at the FIRST = occurrence
-                val split = entry.split("=", ignoreCase = true, limit = 2)
-                if (split.size == 2) newAspects.add(split[1])
+    /** Species ids are `namespace:path`; a wildcard form such as `cobblemon:*` is supported too. */
+    private fun matchesSpecies(entity: PokemonEntity, rules: List<String>): Boolean {
+        val species = entity.pokemon.species.resourceIdentifier
+        for (rule in rules) {
+            if (rule.startsWith("#")) continue
+            if (rule == "*") return true
+            if (rule.endsWith(":*")) {
+                if (species.namespace.equals(rule.dropLast(2), ignoreCase = true)) return true
+            } else if (species.toString().equals(rule, ignoreCase = true)) {
+                return true
             }
         }
-        return newAspects
+        return false
+    }
+
+    private fun matchesAspects(entity: PokemonEntity, aspects: List<String>): Boolean {
+        if (aspects.isEmpty()) return false
+        return entity.pokemon.aspects.any { aspect -> aspects.contains(aspect) }
+    }
+
+    private fun matchesTags(entity: PokemonEntity, tags: List<String>): Boolean {
+        if (tags.isEmpty() || entity.tags.isEmpty()) return false
+        return entity.tags.any { tag -> tags.contains(tag) }
+    }
+
+    override fun getPlaceholderKey(): String = "pokemon"
+
+    private fun generateAspects(list: List<String>): List<String> {
+        return list.mapNotNull { entry ->
+            if (entry.startsWith("#aspect=", ignoreCase = true)) {
+                entry.split("=", limit = 2).getOrNull(1)?.trim()?.takeIf { it.isNotEmpty() }
+            } else {
+                null
+            }
+        }
     }
 
     private fun generateTags(list: List<String>): List<String> {
-        val newTags = mutableListOf<String>()
-        for (entry in list) {
-            if (entry.startsWith("#tag=", true)) {
-                // split the entry string at the FIRST = occurrence
-                val split = entry.split("=", ignoreCase = true, limit = 2)
-                if (split.size == 2) newTags.add(split[1])
+        return list.mapNotNull { entry ->
+            if (entry.startsWith("#tag=", ignoreCase = true)) {
+                entry.split("=", limit = 2).getOrNull(1)?.trim()?.takeIf { it.isNotEmpty() }
+            } else {
+                null
             }
         }
-        return newTags
     }
 
     override fun toString(): String {
-        return "CobblemonClearable(enabled=$enabled, blacklist=$blacklist, whitelist=$whitelist, " +
-                "blacklistedAspects=$blacklistedAspects, whitelistedAspects=$whitelistedAspects)"
+        return "CobblemonClearable(enabled=$enabled, blacklist=$blacklist, whitelist=$whitelist)"
     }
 }

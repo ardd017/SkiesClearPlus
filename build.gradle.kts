@@ -11,9 +11,22 @@ group = project.properties["group"].toString()
 
 val minecraftVersion = project.properties["minecraft_version"].toString()
 
-base.archivesBaseName = project.properties["mod_name"].toString()
+base.archivesBaseName = project.properties["mod_archive_name"].toString()
 
 repositories {
+    // Local mirror: the Cobblemon artifact is ~130 MB and the upstream maven drops the connection
+    // part way through, so it is vendored into tools/local-maven instead.
+    maven {
+        name = "LocalMirror"
+        url = uri("../tools/local-maven")
+        content {
+            includeGroup("com.cobblemon")
+        }
+    }
+    // Regional mirrors first; the upstream hosts below are reachable but rate limited to a few KB/s.
+    maven("https://bmclapi2.bangbang93.com/maven") { name = "BMCLAPI" }
+    maven("https://maven.aliyun.com/repository/public") { name = "AliyunPublic" }
+    maven("https://mirrors.cloud.tencent.com/nexus/repository/maven-public/") { name = "TencentPublic" }
     mavenCentral()
     maven {
         name = "Modrinth"
@@ -32,6 +45,10 @@ repositories {
     maven("https://maven.impactdev.net/repository/development/")
     maven("https://repo.lucko.me")
     maven("https://maven.pokeskies.com/releases/")
+    // Optional client-side integrations: Cloth Config (settings widgets) and Mod Menu (gear button).
+    // Both are compile-only; users install them separately.
+    maven("https://maven.shedaniel.me/") { name = "Shedaniel" }
+    maven("https://maven.terraformersmc.com/releases/") { name = "TerraformersMC" }
 }
 
 loom {
@@ -39,6 +56,7 @@ loom {
     mods {
         create(modId) {
             sourceSet(sourceSets.main.get())
+            sourceSet(sourceSets.getByName("client"))
         }
     }
 }
@@ -71,6 +89,11 @@ dependencies {
     modImplementation("com.cobblemon:fabric:1.7.0+1.21.1")
 
     modImplementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
+
+    // Optional client-side integrations. Compile-only: they are never bundled, and the client
+    // code that touches them is guarded by isModLoaded checks at runtime.
+    add("modClientCompileOnly", "me.shedaniel.cloth:cloth-config-fabric:${project.properties["cloth_config_version"]}")
+    add("modClientCompileOnly", "com.terraformersmc:modmenu:${project.properties["modmenu_version"]}")
 }
 
 tasks.processResources {
@@ -86,7 +109,8 @@ tasks.processResources {
 }
 
 tasks.remapJar {
-    archiveFileName.set("${project.name}-fabric-$minecraftVersion-${project.version}.jar")
+    val archiveBase = project.properties["mod_archive_name"].toString()
+    archiveFileName.set("$archiveBase-fabric-$minecraftVersion-${project.version}.jar")
 }
 
 tasks.withType<JavaCompile> {
@@ -104,4 +128,7 @@ tasks.withType<AbstractArchiveTask> {
     from("LICENSE") {
         rename { "${it}_${modId}" }
     }
+    // Apache-2.0 section 4(d): a redistributor must include any NOTICE file. Upstream ships none,
+    // so this fork ships ATTRIBUTION.md alongside the licence text instead.
+    from("ATTRIBUTION.md")
 }

@@ -1,34 +1,56 @@
 {
   "debug": false,
+  "language": "auto",
+  "broadcast": {
+    "startup": true,
+    "join": true,
+    "first_join": true,
+    "startup_lines": [
+      "",
+      "<lang:message.broadcast.startup>",
+      ""
+    ],
+    "join_lines": [
+      "",
+      "<lang:message.broadcast.join>",
+      ""
+    ],
+    "first_join_lines": [
+      "<lang:message.broadcast.first_join>"
+    ]
+  },
   "clears": {
     "example": {
       "enabled": true,
-      "interval": 60,
+      "interval": 300,
+      "display_name": "Example Clear",
       "dimensions": [],
       "clear_persistent": false,
+      "grace_seconds": 15,
       "clear_named": false,
       "clear_passengers": true,
       "inform_dimensions_only": true,
+      "warning_seconds": [60, 30, 10, 5, 3, 1],
       "messages": {
         "clear": [
           "",
-          "<dark_red><b>!!</b> <green>Successfully cleared <white>%clear_amount%</white> entities! Clearing again in <white>%clear_time%</white>",
+          "<lang:message.clear.success>",
           ""
         ],
-        "warnings":  {
+        "warnings": {
           "10": [
             "",
-            "<dark_red><b>!!</b> <red>An entity clear is incoming in <white>%time_remaining%</white>! Most entities will be removed.",
+            "<lang:message.clear.warning>",
             ""
           ],
           "5": [
             "",
-            "<dark_red><b>!!</b> <red>An entity clear is incoming in <white>%time_remaining%</white>! Most entities will be removed.",
+            "<lang:message.clear.warning>",
             ""
           ]
         },
         "info": [
-          "<red>The Example Clear will be clearing in <white>%time_remaining%</white>!"
+          "<lang:message.info.timer>"
         ]
       },
       "sounds": {
