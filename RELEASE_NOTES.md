@@ -21,6 +21,8 @@
 - **保护期 `grace_seconds`**（默认 15）。跳过比这更年轻的实体，避免「倒计时归零那一秒刚挖出来的
   方块直接消失」。填 `0` 关闭。
 - **新命令**：`/skiesclear gui`、`/skiesclear language`、`/skiesclear broadcast`。
+- **模组图标**。上游没有图标（`fabric.mod.json` 无 `icon` 字段，jar 里也没有图），本版补了一个
+  自绘的夜空方块 + 线稿垃圾桶 + 金色 `+` 角标，用 `tools/make_icon.py` 生成，没有复用上游素材。
 
 ### 修复
 
@@ -59,8 +61,9 @@
 
 **English summary.** First public build, rewritten from SkiesClear 1.1.2 (Apache-2.0). Adds 21
 per-player languages, a vanilla double-chest settings menu (`/skiesclear gui`), an optional Mod
-Menu / Cloth Config panel, startup/join/first-join announcements, and a 15-second grace period so
-freshly dropped items survive the tick a timer fires. Fixes a config serializer that blanked every
+Menu / Cloth Config panel, startup/join/first-join announcements, a 15-second grace period so
+freshly dropped items survive the tick a timer fires, and a hand-drawn mod icon (upstream ships
+none). Fixes a config serializer that blanked every
 `clearables` block on save, a whitelist that consulted the blacklist, reload resetting every
 countdown, a 21-tick drift in the scheduler, and multi-key NBT rules collapsing into "any key
 matches". Do not install alongside upstream SkiesClear — the mod id is shared on purpose.
