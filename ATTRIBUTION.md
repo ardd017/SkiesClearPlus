@@ -67,6 +67,33 @@ lines originate upstream.
 
 ---
 
+## Icon artwork
+
+The icon is **not** a modification of upstream artwork. Upstream ships no icon at all —
+its `fabric.mod.json` has no `"icon"` field and its jar contains no image files. The Modrinth
+listing shows a picture uploaded separately to the platform, which is not part of the source
+or the released jar.
+
+This fork's icon was drawn from scratch with Pillow primitives by
+[`tools/make_icon.py`](tools/make_icon.py) and is generated, not traced: a night-sky
+gradient with procedurally placed stars, a line-art trash can drawn from seven straight
+segments, and a gold `+` badge. It borrows the upstream *idea* — a trash can, the obvious
+visual for a clearing mod — and the cyan accent, but no pixels, paths or gradients are shared.
+Because the upstream Modrinth icon is offered under MPL-2.0 and this fork is Apache-2.0,
+keeping the artwork independently authored avoids mixing licence obligations.
+
+Regenerate the whole set with `python tools/make_icon.py`. Files involved:
+
+| Path | Purpose |
+|---|---|
+| `src/main/resources/assets/skiesclear/icon.png` | 256 px, shipped inside the jar |
+| `docs/icon.png` | same image, referenced by both READMEs |
+| `docs/icon-large.png` | 1024 px master, for Modrinth / GitHub social preview |
+| `docs/icon-rounded.png` | same art, rounded corners, for platform avatars |
+| `docs/banner.png` | 1280×400 header strip |
+
+---
+
 ## Note on the upstream license declaration
 
 The upstream repository is inconsistent, and this fork follows the `LICENSE` file:

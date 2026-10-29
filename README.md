@@ -1,5 +1,7 @@
 # SkiesClear Plus
 
+<img align="right" width="140" src="docs/icon.png" alt="SkiesClear Plus"/>
+
 **中文** ｜ [English](README_EN.md)
 
 > **这是二创分支。** SkiesClear Plus 基于 **PokeSkies** 的

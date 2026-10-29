@@ -1,5 +1,7 @@
 # SkiesClear Plus
 
+<img align="right" width="140" src="docs/icon.png" alt="SkiesClear Plus"/>
+
 [中文](README.md) ｜ **English**
 
 > **This is a fork.** SkiesClear Plus is a modified version of

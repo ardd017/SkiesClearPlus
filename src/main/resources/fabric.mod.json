@@ -4,6 +4,7 @@
   "version": "${version}",
   "name": "SkiesClear Plus",
   "description": "Fork of SkiesClear by PokeSkies. A server-sided entity clearing mod with an in-game settings menu, per-player localized messages and join announcements. Ships 21 languages. See ATTRIBUTION.md for the full list of changes from upstream.",
+  "icon": "assets/skiesclear/icon.png",
   "authors": [
     "PokeSkies",
     "ardd_017"
@@ -12,9 +13,9 @@
     "ardd_017"
   ],
   "contact": {
-    "homepage": "https://github.com/PokeSkies/SkiesClear",
-    "sources": "https://github.com/PokeSkies/SkiesClear",
-    "issues": "https://github.com/PokeSkies/SkiesClear/issues"
+    "homepage": "https://github.com/ardd017/SkiesClearPlus",
+    "sources": "https://github.com/ardd017/SkiesClearPlus",
+    "issues": "https://github.com/ardd017/SkiesClearPlus/issues"
   },
   "license": "Apache-2.0",
   "environment": "*",
